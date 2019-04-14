@@ -1,0 +1,19 @@
+#!/bin/bash
+inputfile=XrdMonitorCreateTextForXmfarMatevz.txt
+function xrdmonitoring_ndays_ago_plus_one_count () {
+  s=T2_US_Florida
+  wanted=$(date -d "1 day ago" +%Y-%m-%d)
+  [ $# -gt 0  ] && s=$1
+  [ $# -gt 1  ] && wanted=$2
+  wanted_day=$(date -d "$wanted" +%d)
+  today=$(date +%d)
+  days_ago=$(expr $today - $wanted_day)
+  pastfuture="ago"
+  [ $days_ago -lt 0 ] && pastfuture=""
+  Ymd=$(date -d "$days_ago days $pastfuture" +%Y-%m-%d)
+  wanted_day_plus_1=$(date -d "1 day $Ymd" +%d)
+  wanted_plus_1=$(date -d "1 day $Ymd" +%Y-%m-%d)
+  days_ago_plus_1=$(expr $today - $wanted_day_plus_1)
+  echo $wanted $wanted_day $wanted_plus_1 $wanted_day_plus_1 $days_ago $days_ago_plus_1
+  grep "$wanted\|$wanted_plus_1" $inputfile # | head -10
+}
