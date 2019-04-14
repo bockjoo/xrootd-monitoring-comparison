@@ -1,0 +1,20 @@
+#!/bin/bash
+function grafana_xrootd_ndays_ago_plus_one_count ()  {
+  [ -f token.txt ] || { echo ERROR you will need the grafana access token, token.txt. Get it from CERN AFS area or send me an email ; } ;
+  s=T2_US_Florida
+  wanted=$(date -d "1 day ago" +%Y-%m-%d)
+  [ $# -gt 0  ] && s=$1
+  [ $# -gt 1  ] && wanted=$2
+  wanted_day=$(date -d "$wanted" +%d)
+  today=$(date +%d)
+  days_ago=$(expr $today - $wanted_day)
+  pastfuture="ago"
+  [ $days_ago -lt 0 ] && pastfuture=""
+  Ymd=$(date -d "$days_ago days $pastfuture" +%Y-%m-%d)
+  wanted_day_plus_1=$(date -d "1 day $Ymd" +%d)
+  days_ago_plus_1=$(expr $today - $wanted_day_plus_1)
+  #echo $days_ago $days_ago_plus_1
+  #curl -G -H "Authorization: Bearer $(cat token.txt)" "https://monit-grafana.cern.ch/api/datasources/proxy/8035/query?db=monit_production_transfer" --data-urlencode "q=SELECT mean(count) from raw.transfer_raw WHERE vo='cms' AND remote_access =~ /^true/  AND technology = 'xrootd' AND time >= now() - 6d and time <= now() - 0d AND src_experiment_site = 'T2_US_Florida' GROUP BY time(10m)" 2>/dev/null | sed "s#\[\"#\n\[\"#g" | grep "\[\"[0-9][0-9][0-9][0-9]"
+  #curl -G -H "Authorization: Bearer $(cat token.txt)" "https://monit-grafana.cern.ch/api/datasources/proxy/8035/query?db=monit_production_transfer" --data-urlencode "q=SELECT src_experiment_site,sum(count),sum(transferred_volume),sum(operation_time) from one_month.transfer_xrootd WHERE vo='cms' AND remote_access =~ /^true/  AND technology = 'xrootd' AND time >= now() - 1d and time <= now() - 0d AND src_experiment_site = '$s' GROUP BY time(10m)" 2>/dev/null  | sed "s#\[\"#\n\[\"#g" | grep "\[\"[0-9][0-9][0-9][0-9]"
+  curl -G -H "Authorization: Bearer $(cat token.txt)" "https://monit-grafana.cern.ch/api/datasources/proxy/8035/query?db=monit_production_transfer" --data-urlencode "q=SELECT src_experiment_site,count,transferred_volume,avg_operation_time from one_month.transfer_xrootd WHERE vo='cms' AND remote_access =~ /^true/  AND technology = 'xrootd' AND time >= now() - ${days_ago}d and time <= now() - ${days_ago_plus_1}d AND src_experiment_site = '$s'" 2>/dev/null | sed "s#\[\"#\n\[\"#g" | grep "\[\"[0-9][0-9][0-9][0-9]"
+}
