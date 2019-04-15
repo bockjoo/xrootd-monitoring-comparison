@@ -39,4 +39,10 @@ for i in xrange(entries):
         leaves=leaves+" "+l.GetName()+"="+str(tree.GetLeaf(l.GetName()).GetValue(i))
     tree.GetLeaf("S.mSite").PrintValue(i)
     print leaves
+    #root C
+    #sprintf(val,"%s",(char*)leaf->GetValuePointer());
     
+    #pyROOT python
+    #                        tree.GetLeaf("S.mSite").GetValuePointer()
+    #mSite = "%s" % tree.GetLeaf("S.mSite").GetValuePointer()
+
